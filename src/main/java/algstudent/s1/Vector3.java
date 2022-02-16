@@ -1,0 +1,22 @@
+package algstudent.s1;
+
+public class Vector3 {
+
+	static int[] v;
+
+	public static void main(String[] args) {
+		long t1, t2;
+		
+		for (int n = 10; n <= Integer.MAX_VALUE; n *= 5) {
+			v = new int[n];
+			Vector1.fillIn(v);
+
+			t1 = System.currentTimeMillis();
+			var sum = Vector1.sum(v);
+			t2 = System.currentTimeMillis();
+
+			System.out.printf("SIZE = %d \nTIME = %d milli \nSUM = %d\n\n", n, t2 - t1, sum);
+		}
+	}
+
+}
