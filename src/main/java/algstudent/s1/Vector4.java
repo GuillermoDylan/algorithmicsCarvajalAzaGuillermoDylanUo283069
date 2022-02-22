@@ -13,24 +13,22 @@ public class Vector4 {
 
 		for (int n = 10; n <= Integer.MAX_VALUE; n *= 3) {
 			v = new int[n];
-			
-			t1 = System.currentTimeMillis();
-			
+
 			Vector1.fillIn(v);
 
-			t2 = System.currentTimeMillis();
-			
 			sum = Vector1.sum(v);
 
+			t1 = System.currentTimeMillis();
 			for (int rep = 1; rep <= repetitions; rep++) {
 				m = new int[n];
 				Vector1.maximum(v, m);
 			}
-			
+			t2 = System.currentTimeMillis();
+
 			max = m[0];
-			
-			System.out.printf("SIZE = %d \nTIME = %d milli \nSUM = %d \nRPETITIONS = %d \nMAXIMUM = %d\n\n", n, t2 - t1, sum,
-					repetitions, max);
+
+			System.out.printf("SIZE = %d \nTIME = %d milli \nSUM = %d \nRPETITIONS = %d \nMAXIMUM = %d\n\n", n, t2 - t1,
+					sum, repetitions, max);
 		}
 	}
 
