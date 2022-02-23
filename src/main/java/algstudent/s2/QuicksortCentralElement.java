@@ -9,29 +9,27 @@ public class QuicksortCentralElement extends Vector {
 	}
 
 	private void quickSort(int left, int right) {
+		int i = left;
+		int j = right - 1;
+		int pivot;
 		
-		// Probably wrong
-		int central = (right + 1) / 2;
-		for (int k = 0; k < elements.length; k++) {
-			
-			int pivot = elements[central];
-			
-			elements[central] = elements[elements.length - 1];
-			elements[elements.length - 1] = pivot;
-			
-			for (int i = 0; i < elements.length; i++) {
-				for (int j = elements.length - 2; j >= i; j--) {
-					if (elements[i] > pivot && elements[j] < pivot) {
-						int aux = elements[i];
-						elements[i] = elements[j];
-						elements[j] = aux;
-						break;
-					}
-				}
-			}
-			elements[elements.length - 1] = elements[central];
-			elements[central] = pivot;
-		}
+		if (left < right){ //if there is one element it is not necessary
+			int toParticionate = (right + 1) / 2;; // Now we use the center as the pivot to particionate
+			pivot = elements[toParticionate]; //choose the pivot
+			interchange(toParticionate, right); //hide the pivot
+				
+			do {         
+		    	while (elements[i] <= pivot && i < right) i++; //first element > pivot
+		    	while (elements[j] >= pivot && j > left) j--; //first element < pivot
+		        if (i < j) interchange(i, j);
+		    } while (i < j);   //end while
+				
+			//we set the position of the pivot
+			interchange(i, right);
+			quickSort(left, i-1);
+			quickSort(i+1, right);		
+		} 
+		
 	}
 
 	@Override
