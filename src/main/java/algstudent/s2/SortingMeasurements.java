@@ -2,7 +2,7 @@ package algstudent.s2;
 
 public class SortingMeasurements {
 	private static int differentSizes = 8; //how many sizes do you want to use in the measurements 
-	private static int repetitions = 1; //number of repetitions of the executions
+	private static int repetitions = 100; //number of repetitions of the executions
 	private static String option = "random"; //working with sorted/inversely sorted/random vectors
 
 	/** This program could be used to test all the sorting algorithms
@@ -21,11 +21,11 @@ public class SortingMeasurements {
 //		
 //		measureTimes(new Selection(n), it);
 //		
-		measureTimes(new Bubble(n), it);
+//		measureTimes(new Bubble(n), it);
 //		
 //		measureTimes(new QuicksortFateful(n), it);
 //		
-//		measureTimes(new QuicksortCentralElement(n), it);
+		measureTimes(new QuicksortCentralElement(n), it);
 //		
 //		measureTimes(new QuicksortMedianOfThree(n), it);
 	}
