@@ -31,7 +31,9 @@ public class FileUtil {
 				String[] adjacent = lines[1].split(",");
 
 				for (int i = 0; i < adjacent.length; i++) {
-					adjacency.add(adjacent[i]);
+					if (!adjacent[i].strip().equals("NO")) {
+						adjacency.add(adjacent[i]);
+					}
 				}
 				nodes.add(new Node(name, adjacency));
 
