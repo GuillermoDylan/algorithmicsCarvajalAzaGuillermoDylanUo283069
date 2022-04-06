@@ -162,56 +162,59 @@ public class ImageAverager {
 	 */
 	public void splitSubsetsBacktracking(int max_unbalancing) {
 		this.counter = 0;
-		backtrackingWithUnbalancing(0, max_unbalancing);
+		backtrackingWithUnbalancing(0, max_unbalancing, 0, 0);
 	}
 
-	private void backtrackingWithUnbalancing(int level, int max_unbalancing) {
-		// BUG: does never stop, even when we have more than 13 images on the set, why?
-		// because its not established a condition to stop recursion (?)
-		int set1 = 0, set2 = 0, set0 = 0;
-		int[] X = new int[dataset.length];
-		for (int i = 0; i < dataset.length; i++) {
+	private void backtrackingWithUnbalancing(int level, int max_unbalancing, int set1, int set2) {
+		if (level == dataset.length) {
+			// Solution found
+			counter = 0;
+			avg_img.addSignal(half1_img);
+			avg_img.addSignal(half2_img);
+			if (avg_img.zncc(real_img) > max_zncc) {
+				max_zncc = avg_img.zncc(real_img);
+				printSol(sol);
+				sol = new int[dataset.length];
+			}
+		} else {
 			for (int j = 0; j < NUMBER_OF_SETS; j++) {
-				counter++;
 				switch (j) {
 				case 1:
 					if (Math.abs(set1 - set2) <= max_unbalancing) {
-						X[i] = 1;
+						sol[counter] = 1;
 						set1++;
+						counter++;
 						this.half1_img.addSignal(dataset[j]);
-						backtrackingWithUnbalancing(level + 1, max_unbalancing);
+						backtrackingWithUnbalancing(level + 1, max_unbalancing, set1, set2);
 						this.half1_img.removeSignal(dataset[j]);
-					} else {
-						backtrackingWithUnbalancing(level + 1, max_unbalancing);
 					}
 					break;
 				case 2:
 					if (Math.abs(set1 - set2) <= max_unbalancing) {
-						X[i] = 2;
+						sol[counter] = 2;
 						set2++;
+						counter++;
 						this.half2_img.addSignal(dataset[j]);
-						backtrackingWithUnbalancing(level + 1, max_unbalancing);
+						backtrackingWithUnbalancing(level + 1, max_unbalancing, set1, set2);
 						this.half2_img.removeSignal(dataset[j]);
-					} else {
-						backtrackingWithUnbalancing(level + 1, max_unbalancing);
 					}
 					break;
 				case 0: // Image not used
-					X[i] = 0;
-					set0++;
-					backtrackingWithUnbalancing(level + 1, max_unbalancing);
+					sol[counter] = 0;
+					counter++;
+					backtrackingWithUnbalancing(level + 1, max_unbalancing, set1, set2);
 					break;
 				}
 			}
 		}
-		this.avg_img.addSignal(this.half1_img);
-		this.avg_img.addSignal(this.half2_img);
-		printSol(X);
 	}
 
 	private void printSol(int[] x) {
 		for (int i = 0; i < x.length; i++) {
-			System.out.printf("%d, ", x[i]);
+			if (i != x.length - 1)
+				System.out.printf("%d, ", x[i]);
+			else
+				System.out.printf("%d \n", x[i]);
 		}
 	}
 
@@ -225,12 +228,34 @@ public class ImageAverager {
 	}
 
 	private void backtracking(int level) {
-		for (int i = 0; i < dataset.length; i++) {
+		if (level == dataset.length) {
+			// Solution found
+			avg_img.addSignal(half1_img);
+			avg_img.addSignal(half2_img);
+			if (avg_img.zncc(real_img) > max_zncc) {
+				max_zncc = avg_img.zncc(real_img);
+				printSol(sol);
+			}
+		} else {
+			
+			sol[counter] = 1;
+			this.half1_img.addSignal(dataset[1]);
 			counter++;
-			// Code
 			backtracking(level + 1);
-			// Leave everything as before
+			counter--;
+			this.half1_img.removeSignal(dataset[1]);
+			
+			sol[counter] = 2;
+			this.half2_img.addSignal(dataset[2]);
+			counter++;
+			backtracking(level + 1);
+			counter--;
+			this.half2_img.removeSignal(dataset[2]);
 
+			sol[counter] = 0;
+			counter++;
+			backtracking(level + 1);
+			counter--;
 		}
 	}
 

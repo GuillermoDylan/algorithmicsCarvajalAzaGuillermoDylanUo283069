@@ -29,12 +29,17 @@ public class ImageAveragerBench {
 		System.out.printf("  -Counter: %d\n",  img_avger.getCounter());
 		img_avger.saveResults(OUT_DIR_G);
 			
-		System.out.print("TESTING BACKTRACKING BALANCING:\n");
-		img_avger.splitSubsetsBacktracking(1);
+//		System.out.print("TESTING BACKTRACKING BALANCING:\n");
+//		img_avger.splitSubsetsBacktracking(1);
+//		System.out.printf("  -ZNCC: %f\n",  img_avger.zncc());
+//		System.out.printf("  -Counter: %d\n",  img_avger.getCounter());
+//		img_avger.saveResults(OUT_DIR_B);
+
+		System.out.print("TESTING BACKTRACKING  NO BALANCING:\n");
+		img_avger.splitSubsetsBacktracking();
 		System.out.printf("  -ZNCC: %f\n",  img_avger.zncc());
 		System.out.printf("  -Counter: %d\n",  img_avger.getCounter());
 		img_avger.saveResults(OUT_DIR_B);
-
 		// Measurements
 		// TODO
 	}
