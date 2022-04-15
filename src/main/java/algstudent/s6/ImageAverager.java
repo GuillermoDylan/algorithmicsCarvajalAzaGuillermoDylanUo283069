@@ -2,6 +2,7 @@ package algstudent.s6;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -18,6 +19,7 @@ public class ImageAverager {
 	private int counter; // to store the number of times we assign an image to half1, half2 or no group
 	private double max_zncc; // to store the best ZNCC
 	private static int NUMBER_OF_SETS = 3; // Represents the number of sets (G1, G2, G0) where the images can be sent
+	private int totalCounter; // To store the total counter
 
 	/**
 	 * Constructor
@@ -128,6 +130,7 @@ public class ImageAverager {
 	 */
 	public void splitSubsetsGreedy(int n_tries) {
 		this.counter = 0;
+		this.max_zncc = -1;
 		this.half1_img = new Image(this.width, this.height);
 		this.half2_img = new Image(this.width, this.height);
 		this.avg_img = new Image(this.width, this.height);
@@ -138,20 +141,25 @@ public class ImageAverager {
 
 				switch (position) {
 				case 0:
-					// In this case we do not use the image
+					sol[j] = 0;
 					break;
 				case 1: // Image used on for the first half
-					this.half1_img.addSignal(dataset[j]);
+					sol[j] = 1;
 					break;
 				case 2: // Image used for the second half
-					this.half2_img.addSignal(dataset[j]);
+					sol[j] = 2;
 					break;
 				}
 			}
+			this.half1_img = calculateImage(1, sol);
+			this.half2_img = calculateImage(2, sol);
+			if(zncc() > max_zncc) {
+				max_zncc = zncc();
+				bestSol = sol.clone();
+			}
 
 		}
-		this.avg_img.addSignal(this.half1_img);
-		this.avg_img.addSignal(this.half2_img);
+		storeBestSolution();
 	}
 
 	/**
@@ -162,51 +170,61 @@ public class ImageAverager {
 	 */
 	public void splitSubsetsBacktracking(int max_unbalancing) {
 		this.counter = 0;
-		backtrackingWithUnbalancing(0, max_unbalancing, 0, 0);
+		this.max_zncc = -1;
+		this.totalCounter = 0;
+		this.half1_img = new Image(this.width, this.height);
+		this.half2_img = new Image(this.width, this.height);
+		this.avg_img = new Image(this.width, this.height);
+		this.sol = new int[sol.length];
+		this.bestSol = new int[bestSol.length];
+		
+		backtrackingWithUnbalancing(0, max_unbalancing, 0, 0, 0);
+		storeBestSolution();
+		System.out.println("Best solution: ");
+		printSol(bestSol);
 	}
 
-	private void backtrackingWithUnbalancing(int level, int max_unbalancing, int set1, int set2) {
+	private void backtrackingWithUnbalancing(int level, int max_unbalancing, int set1, int set2, int set0) {
 		if (level == dataset.length) {
 			// Solution found
-			counter = 0;
-			avg_img.addSignal(half1_img);
-			avg_img.addSignal(half2_img);
-			if (avg_img.zncc(real_img) > max_zncc) {
-				max_zncc = avg_img.zncc(real_img);
-				printSol(sol);
-				sol = new int[dataset.length];
+			this.half1_img = calculateImage(1, sol);
+			this.half2_img = calculateImage(2, sol);
+			if (zncc() > max_zncc) {
+				max_zncc = zncc();
+				bestSol = sol.clone();
 			}
 		} else {
-			for (int j = 0; j < NUMBER_OF_SETS; j++) {
-				switch (j) {
-				case 1:
-					if (Math.abs(set1 - set2) <= max_unbalancing) {
-						sol[counter] = 1;
-						set1++;
-						counter++;
-						this.half1_img.addSignal(dataset[j]);
-						backtrackingWithUnbalancing(level + 1, max_unbalancing, set1, set2);
-						this.half1_img.removeSignal(dataset[j]);
-					}
-					break;
-				case 2:
-					if (Math.abs(set1 - set2) <= max_unbalancing) {
-						sol[counter] = 2;
-						set2++;
-						counter++;
-						this.half2_img.addSignal(dataset[j]);
-						backtrackingWithUnbalancing(level + 1, max_unbalancing, set1, set2);
-						this.half2_img.removeSignal(dataset[j]);
-					}
-					break;
-				case 0: // Image not used
-					sol[counter] = 0;
-					counter++;
-					backtrackingWithUnbalancing(level + 1, max_unbalancing, set1, set2);
-					break;
-				}
+
+			if (set1 - set2 <= max_unbalancing) { // Pruning
+				sol[level] = 1;
+				counter++;
+				set1++;
+				backtrackingWithUnbalancing(level + 1, max_unbalancing, set1, set2, set0);
+				set1--;
+				
+				sol[level] = 2;
+				set2++;
+				counter++;
+				backtrackingWithUnbalancing(level + 1, max_unbalancing, set1, set2, set0);
+				set2--;
+				
+				sol[level] = 0;
+				counter++;
+				set0++;
+				backtrackingWithUnbalancing(level + 1, max_unbalancing, set1, set2, set0);
+				set0--;
 			}
 		}
+	}
+
+	private Image calculateImage(int i, int array[]) {
+		Image half = new Image(this.width, this.height);
+		for (int j = 0; j < sol.length; j++) {
+			if(array[j] == i) {
+				half.addSignal(dataset[j]);
+			}
+		}
+		return half;
 	}
 
 	private void printSol(int[] x) {
@@ -224,39 +242,56 @@ public class ImageAverager {
 	 */
 	public void splitSubsetsBacktracking() {
 		this.counter = 0;
+		this.max_zncc = -1;
+		this.half1_img = new Image(this.width, this.height);
+		this.half2_img = new Image(this.width, this.height);
+		this.avg_img = new Image(this.width, this.height);
+		this.sol = new int[sol.length];
+		this.bestSol = new int[bestSol.length];
 		backtracking(0);
+		storeBestSolution();
+		System.out.println("Best solution: ");
+		printSol(bestSol);
+		counter = totalCounter;
 	}
 
 	private void backtracking(int level) {
 		if (level == dataset.length) {
 			// Solution found
-			avg_img.addSignal(half1_img);
-			avg_img.addSignal(half2_img);
-			if (avg_img.zncc(real_img) > max_zncc) {
-				max_zncc = avg_img.zncc(real_img);
-				printSol(sol);
+			this.half1_img = calculateImage(1, sol);
+			this.half2_img = calculateImage(2, sol);
+			if (zncc() > max_zncc) {
+				this.max_zncc = zncc();
+				this.bestSol = sol.clone();
 			}
 		} else {
-			
-			sol[counter] = 1;
-			this.half1_img.addSignal(dataset[1]);
-			counter++;
-			backtracking(level + 1);
-			counter--;
-			this.half1_img.removeSignal(dataset[1]);
-			
-			sol[counter] = 2;
-			this.half2_img.addSignal(dataset[2]);
-			counter++;
-			backtracking(level + 1);
-			counter--;
-			this.half2_img.removeSignal(dataset[2]);
 
-			sol[counter] = 0;
+			sol[level] = 1;
 			counter++;
+			totalCounter++;
 			backtracking(level + 1);
-			counter--;
+
+			sol[level] = 2;
+			counter++;
+			totalCounter++;
+			backtracking(level + 1);
+
+			sol[level] = 0;
+			counter++;
+			totalCounter++;
+			backtracking(level + 1);
 		}
+	}
+	
+	private void storeBestSolution() {
+		Image baseImageHalf1 = calculateImage(1, bestSol);
+		Image baseImageHalf2 = calculateImage(2, bestSol);
+		Image finalImage = new Image(this.width, this.height);
+		finalImage.addSignal(baseImageHalf1);
+		finalImage.addSignal(baseImageHalf2);
+		this.half1_img = baseImageHalf1;
+		this.half2_img = baseImageHalf2;
+		this.avg_img = finalImage;
 	}
 
 }

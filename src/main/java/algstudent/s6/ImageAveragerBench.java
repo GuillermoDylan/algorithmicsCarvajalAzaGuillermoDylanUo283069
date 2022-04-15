@@ -9,7 +9,7 @@ public class ImageAveragerBench {
 	private static String BAD_IMG = Paths.get("").toAbsolutePath().toString() + "/src/main/java/algstudent/s6/einstein_1_256.png";
 	private static String OUT_DIR_G = Paths.get("").toAbsolutePath().toString() + "/src/main/java/algstudent/s6/out_g";
 	private static String OUT_DIR_B = Paths.get("").toAbsolutePath().toString() + "/src/main/java/algstudent/s6/out_bt";
-	private static int N_IMGS = 13; 
+	private static int N_IMGS = 2; 
 	private static double PERCENTAGE_BAD = 25; // %
 	private static double S_NOISE = 5.0; // Noise level - Gaussian sigma
 	private static int N_TRIES_GREEDY = 100;
@@ -28,20 +28,25 @@ public class ImageAveragerBench {
 		System.out.printf("  -ZNCC: %f\n",  img_avger.zncc());
 		System.out.printf("  -Counter: %d\n",  img_avger.getCounter());
 		img_avger.saveResults(OUT_DIR_G);
-			
-//		System.out.print("TESTING BACKTRACKING BALANCING:\n");
-//		img_avger.splitSubsetsBacktracking(1);
-//		System.out.printf("  -ZNCC: %f\n",  img_avger.zncc());
-//		System.out.printf("  -Counter: %d\n",  img_avger.getCounter());
-//		img_avger.saveResults(OUT_DIR_B);
-
+		
+		double time = System.currentTimeMillis();
+		
+		System.out.print("TESTING BACKTRACKING BALANCING:\n");
+		img_avger.splitSubsetsBacktracking(1);
+		System.out.printf("  -ZNCC: %f\n",  img_avger.zncc());
+		System.out.printf("  -Counter: %d\n",  img_avger.getCounter());
+		img_avger.saveResults(OUT_DIR_B);
+		System.out.printf("  -Time:%f\n", System.currentTimeMillis()-time);
+		
+		time = System.currentTimeMillis();
+		
 		System.out.print("TESTING BACKTRACKING  NO BALANCING:\n");
 		img_avger.splitSubsetsBacktracking();
 		System.out.printf("  -ZNCC: %f\n",  img_avger.zncc());
 		System.out.printf("  -Counter: %d\n",  img_avger.getCounter());
 		img_avger.saveResults(OUT_DIR_B);
-		// Measurements
-		// TODO
+		System.out.printf("  -Time:%f\n", System.currentTimeMillis()-time);
+		
 	}
 
 }
