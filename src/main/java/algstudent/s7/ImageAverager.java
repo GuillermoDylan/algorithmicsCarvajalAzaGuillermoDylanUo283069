@@ -8,18 +8,32 @@ import java.util.Random;
 
 public class ImageAverager {
 
-	private Image real_img, bad_img; // to store the main good and main bad image
-	private Image avg_img, half1_img, half2_img; // to store the final tests to see if we improve the previous results
-	private Image[] dataset; // dataset to store all the images (good and bad ones)
-	private int[] sol; // to store the partial results (where I am putting the pictures? 0->not
-						// assigned, 1->first half, 2->second half
-	private int[] bestSol; // to store the best solution
-	private int width, height; // to store the width and height of the image
+	protected Image real_img, bad_img; // to store the main good and main bad image
+	protected Image avg_img, half1_img, half2_img; // to store the final tests to see if we improve the previous results
+	protected Image[] dataset; // dataset to store all the images (good and bad ones)
+	protected int[] sol; // to store the partial results (where I am putting the pictures? 0->not
+							// assigned, 1->first half, 2->second half
+	protected int[] bestSol; // to store the best solution
+	protected int width, height; // to store the width and height of the image
 	// backtracking variables
-	private int counter; // to store the number of times we assign an image to half1, half2 or no group
-	private double max_zncc; // to store the best ZNCC
-	private static int NUMBER_OF_SETS = 3; // Represents the number of sets (G1, G2, G0) where the images can be sent
-	private int totalCounter; // To store the total counter
+	protected int counter; // to store the number of times we assign an image to half1, half2 or no group
+	protected double max_zncc; // to store the best ZNCC
+	protected static int NUMBER_OF_SETS = 3; // Represents the number of sets (G1, G2, G0) where the images can be sent
+	protected int totalCounter; // To store the total counter
+
+	public ImageAverager(ImageAverager manager) {
+		this.avg_img = manager.avg_img;
+		this.half1_img = manager.half1_img;
+		this.half2_img = manager.half2_img;
+		this.sol = manager.sol.clone();
+		this.bestSol = manager.bestSol.clone();
+		this.counter = manager.counter;
+		this.max_zncc = manager.max_zncc;
+		this.dataset = manager.dataset.clone();
+		this.width = manager.width;
+		this.height = manager.height;
+		this.totalCounter = manager.totalCounter;
+	}
 
 	/**
 	 * Constructor
@@ -153,7 +167,7 @@ public class ImageAverager {
 			}
 			this.half1_img = calculateImage(1, sol);
 			this.half2_img = calculateImage(2, sol);
-			if(zncc() > max_zncc) {
+			if (zncc() > max_zncc) {
 				max_zncc = zncc();
 				bestSol = sol.clone();
 			}
@@ -177,7 +191,7 @@ public class ImageAverager {
 		this.avg_img = new Image(this.width, this.height);
 		this.sol = new int[sol.length];
 		this.bestSol = new int[bestSol.length];
-		
+
 		backtrackingWithUnbalancing(0, max_unbalancing, 0, 0, 0);
 		storeBestSolution();
 		System.out.println("Best solution: ");
@@ -201,13 +215,13 @@ public class ImageAverager {
 				set1++;
 				backtrackingWithUnbalancing(level + 1, max_unbalancing, set1, set2, set0);
 				set1--;
-				
+
 				sol[level] = 2;
 				set2++;
 				counter++;
 				backtrackingWithUnbalancing(level + 1, max_unbalancing, set1, set2, set0);
 				set2--;
-				
+
 				sol[level] = 0;
 				counter++;
 				set0++;
@@ -220,7 +234,7 @@ public class ImageAverager {
 	private Image calculateImage(int i, int array[]) {
 		Image half = new Image(this.width, this.height);
 		for (int j = 0; j < sol.length; j++) {
-			if(array[j] == i) {
+			if (array[j] == i) {
 				half.addSignal(dataset[j]);
 			}
 		}
@@ -282,8 +296,8 @@ public class ImageAverager {
 			backtracking(level + 1);
 		}
 	}
-	
-	private void storeBestSolution() {
+
+	public void storeBestSolution() {
 		Image baseImageHalf1 = calculateImage(1, bestSol);
 		Image baseImageHalf2 = calculateImage(2, bestSol);
 		Image finalImage = new Image(this.width, this.height);
@@ -292,6 +306,22 @@ public class ImageAverager {
 		this.half1_img = baseImageHalf1;
 		this.half2_img = baseImageHalf2;
 		this.avg_img = finalImage;
+	}
+
+	public void calculateImage(int[] solution) {
+		for (int i = 0; i < solution.length; i++) {
+			switch (solution[i]) {
+			case 1:
+				this.half1_img.addSignal(dataset[i]);
+				break;
+
+			case 2:
+				this.half2_img.addSignal(dataset[i]);
+				break;
+			default:
+				break;
+			}
+		}
 	}
 
 }

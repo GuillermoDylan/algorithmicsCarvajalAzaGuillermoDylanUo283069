@@ -15,7 +15,7 @@ public abstract class BranchAndBound {
 	protected Heap ds; //Nodes to be explored (not used nodes)
 	protected Node bestNode; //To save the final node of the best solution
 	protected Node rootNode; //Initial node
-	protected int pruneLimit; //To prune nodes above this value
+	protected double pruneLimit; //To prune nodes above this value
 	       
 	/**
 	 * Constructor for BrancAndBount objects
@@ -40,7 +40,7 @@ public abstract class BranchAndBound {
 			
 			for (Node child : children)
 				if (child.isSolution()) {
-					int cost = child.getHeuristicValue();
+					double cost = child.getHeuristicValue();
 					if (cost < pruneLimit) {
 						pruneLimit = cost;
 						bestNode = child;
