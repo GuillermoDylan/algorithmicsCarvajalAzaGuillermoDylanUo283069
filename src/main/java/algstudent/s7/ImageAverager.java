@@ -2,7 +2,6 @@ package algstudent.s7;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -21,11 +20,17 @@ public class ImageAverager {
 	protected static int NUMBER_OF_SETS = 3; // Represents the number of sets (G1, G2, G0) where the images can be sent
 	protected int totalCounter; // To store the total counter
 
-	public ImageAverager(ImageAverager manager) {
-		this.avg_img = manager.avg_img;
-		this.half1_img = manager.half1_img;
-		this.half2_img = manager.half2_img;
-		this.sol = manager.sol.clone();
+	/**
+	 * Constructo for the ImageAverager class to be used when doing Branch and Bound
+	 * in order to copy the 'fathers' manager into the 'childs', we also need to
+	 * provide a copy of the solution array, so that we can copy it in here to
+	 * generate the childs solution.
+	 * 
+	 * @param manager  the fathers ImageAverager
+	 * @param solution the cloned solution of the father
+	 */
+	public ImageAverager(ImageAverager manager, int[] solution) {
+		this.sol = solution.clone();
 		this.bestSol = manager.bestSol.clone();
 		this.counter = manager.counter;
 		this.max_zncc = manager.max_zncc;
@@ -309,6 +314,10 @@ public class ImageAverager {
 	}
 
 	public void calculateImage(int[] solution) {
+		this.half1_img = new Image(this.width, this.height);
+		this.half2_img = new Image(this.width, this.height);
+		this.avg_img = new Image(this.width, this.height);
+		this.bestSol = solution.clone();
 		for (int i = 0; i < solution.length; i++) {
 			switch (solution[i]) {
 			case 1:
@@ -318,10 +327,12 @@ public class ImageAverager {
 			case 2:
 				this.half2_img.addSignal(dataset[i]);
 				break;
-			default:
+			case 0:
 				break;
 			}
 		}
+		this.avg_img.addSignal(half1_img);
+		this.avg_img.addSignal(half2_img);
 	}
 
 }

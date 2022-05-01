@@ -26,29 +26,29 @@ public class ImageAveragerBench {
 		n_real = N_IMGS - n_bad;
 		img_avger = new ImageAverager(REAL_IMG, BAD_IMG, n_real, n_bad, S_NOISE);
 
-		System.out.print("TESTING GREEDY:\n");
-		img_avger.splitSubsetsGreedy(N_TRIES_GREEDY);
-		System.out.printf("  -ZNCC: %f\n", img_avger.zncc());
-		System.out.printf("  -Counter: %d\n", img_avger.getCounter());
-		img_avger.saveResults(OUT_DIR_G);
-
+//		System.out.print("TESTING GREEDY:\n");
+//		img_avger.splitSubsetsGreedy(N_TRIES_GREEDY);
+//		System.out.printf("  -ZNCC: %f\n", img_avger.zncc());
+//		System.out.printf("  -Counter: %d\n", img_avger.getCounter());
+//		img_avger.saveResults(OUT_DIR_G);
+//
 		double time = System.currentTimeMillis();
-
-		System.out.print("TESTING BACKTRACKING BALANCING:\n");
-		img_avger.splitSubsetsBacktracking(1);
-		System.out.printf("  -ZNCC: %f\n", img_avger.zncc());
-		System.out.printf("  -Counter: %d\n", img_avger.getCounter());
-		img_avger.saveResults(OUT_DIR_B);
-		System.out.printf("  -Time:%f\n", System.currentTimeMillis() - time);
-
-		
-
-		System.out.print("TESTING BACKTRACKING  NO BALANCING:\n");
-		img_avger.splitSubsetsBacktracking();
-		System.out.printf("  -ZNCC: %f\n", img_avger.zncc());
-		System.out.printf("  -Counter: %d\n", img_avger.getCounter());
-		img_avger.saveResults(OUT_DIR_B);
-		System.out.printf("  -Time:%f\n", System.currentTimeMillis() - time);
+//
+//		System.out.print("TESTING BACKTRACKING BALANCING:\n");
+//		img_avger.splitSubsetsBacktracking(1);
+//		System.out.printf("  -ZNCC: %f\n", img_avger.zncc());
+//		System.out.printf("  -Counter: %d\n", img_avger.getCounter());
+//		img_avger.saveResults(OUT_DIR_B);
+//		System.out.printf("  -Time:%f\n", System.currentTimeMillis() - time);
+//
+//		
+//
+//		System.out.print("TESTING BACKTRACKING  NO BALANCING:\n");
+//		img_avger.splitSubsetsBacktracking();
+//		System.out.printf("  -ZNCC: %f\n", img_avger.zncc());
+//		System.out.printf("  -Counter: %d\n", img_avger.getCounter());
+//		img_avger.saveResults(OUT_DIR_B);
+//		System.out.printf("  -Time:%f\n", System.currentTimeMillis() - time);
 
 		// TODO execute Branch and Bound
 		// create NodeAvg passing img avg

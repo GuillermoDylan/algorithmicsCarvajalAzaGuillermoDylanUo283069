@@ -15,14 +15,14 @@ class NodeAvg extends Node {
 	private ImageAverager manager;
 
 	public ImageAverager getManager() {
-		this.manager.calculateImage(solution);
-		this.manager.storeBestSolution();
+		this.manager.calculateImage(this.manager.sol);
 		return this.manager;
 	}
 
 	public NodeAvg(ImageAverager imageAvg) {
 		this.manager = imageAvg;
 		this.solution = new int[manager.dataset.length];
+		calculateHeuristicValue();
 	}
 
 	public NodeAvg(ImageAverager imageAvg, int depth, UUID parentID) {
@@ -31,16 +31,16 @@ class NodeAvg extends Node {
 		this.parentID = parentID;
 		this.ID = UUID.randomUUID();
 		this.solution = manager.sol;
-		calculateHeuristicValueGradient();
+		calculateHeuristicValue();
 	}
 
 	@Override
 	public void calculateHeuristicValue() {
 		this.manager.calculateImage(solution);
-		heuristicValue = this.manager.zncc();
+		heuristicValue = this.manager.zncc() * -1;
 	}
 
-	public void calculateHeuristicValueGradient() {
+	public void calculateValueGradient() {
 		if (depth != 0) {
 			// Using the gradient, we calculate the zncc for every node (except the first
 			// ones)
@@ -67,11 +67,11 @@ class NodeAvg extends Node {
 	@Override
 	public ArrayList<Node> expand() {
 		ArrayList<Node> result = new ArrayList<Node>();
-
+		int[] solCopy = solution.clone();
 		for (int i = 0; i <= 2; i++) {
-			this.manager.sol[depth] = i; // Why arent values just coppied???
-			result.add(new NodeAvg(new ImageAverager(this.manager), depth + 1, this.getID()));
-			this.manager.sol[depth] = 0;
+			solCopy[depth] = i;
+			result.add(new NodeAvg(new ImageAverager(this.manager, solCopy), depth + 1, this.getID()));
+			solCopy[depth] = 0;
 		}
 		return result;
 	}
