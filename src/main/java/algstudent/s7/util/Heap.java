@@ -1,4 +1,4 @@
-package algstudent.s7;
+package algstudent.s7.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;

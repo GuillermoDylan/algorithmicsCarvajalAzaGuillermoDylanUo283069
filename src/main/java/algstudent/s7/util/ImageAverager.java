@@ -1,4 +1,4 @@
-package algstudent.s7;
+package algstudent.s7.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,8 +9,8 @@ public class ImageAverager {
 
 	protected Image real_img, bad_img; // to store the main good and main bad image
 	protected Image avg_img, half1_img, half2_img; // to store the final tests to see if we improve the previous results
-	protected Image[] dataset; // dataset to store all the images (good and bad ones)
-	protected int[] sol; // to store the partial results (where I am putting the pictures? 0->not
+	public Image[] dataset; // dataset to store all the images (good and bad ones)
+	public int[] sol; // to store the partial results (where I am putting the pictures? 0->not
 							// assigned, 1->first half, 2->second half
 	protected int[] bestSol; // to store the best solution
 	protected int width, height; // to store the width and height of the image

@@ -3,8 +3,12 @@ package algstudent.s7;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class ImageAveragerBnB extends BranchAndBound {
+import algstudent.s7.util.BranchAndBound;
+import algstudent.s7.util.ImageAverager;
+import algstudent.s7.util.Node;
 
+public class ImageAveragerBnB extends BranchAndBound {
+	
 	public ImageAveragerBnB(NodeAvg node) {
 		rootNode = node;
 	}
@@ -13,15 +17,17 @@ public class ImageAveragerBnB extends BranchAndBound {
 class NodeAvg extends Node {
 
 	private ImageAverager manager;
+	private boolean pruneState;
 
 	public ImageAverager getManager() {
 		this.manager.calculateImage(this.manager.sol);
 		return this.manager;
 	}
 
-	public NodeAvg(ImageAverager imageAvg) {
+	public NodeAvg(ImageAverager imageAvg, boolean prune) {
 		this.manager = imageAvg;
 		this.solution = new int[manager.dataset.length];
+		this.pruneState = prune;
 		calculateHeuristicValue();
 	}
 
@@ -36,33 +42,47 @@ class NodeAvg extends Node {
 
 	@Override
 	public void calculateHeuristicValue() {
-		this.manager.calculateImage(solution);
-		heuristicValue = this.manager.zncc() * -1;
+		// If we are using the version without pruning
+		if (!pruneState) {
+			this.manager.calculateImage(solution);
+			heuristicValue = this.manager.zncc() * -1;
+		// Else, on the version with pruning
+		} else {
+			if (this.depth > 0) { // For all nodes except the root node
+				if (prune()) { // If we have to prune, set to max value
+					this.heuristicValue = Double.MAX_VALUE;
+				} else { // Else calculate the heuristic value
+					this.heuristicValue = this.manager.zncc() * -1;
+				}
+			} else {
+				this.manager.calculateImage(solution);
+				this.heuristicValue = this.manager.zncc() * -1;
+			}
+		}
 	}
 
-	public void calculateValueGradient() {
+	public double calculateValueGradient() {
 		if (depth != 0) {
 			// Using the gradient, we calculate the zncc for every node (except the first
 			// ones)
-			double parentZNCC = this.manager.zncc();
+			double parentZNCC = this.manager.zncc() * - 1;
 			this.manager.calculateImage(solution);
-			this.heuristicValue = this.manager.zncc() - parentZNCC;
+			return (this.manager.zncc() * - 1) - parentZNCC;
 		} else {
 			this.manager.calculateImage(solution);
-			heuristicValue = this.manager.zncc();
+			return (this.manager.zncc() * - 1);
 		}
 
 	}
 
-//	private boolean prune() {
-//		int numZeros = 0;
-//		for (int i = 0; i < solution.length; i++) {
-//			if(solution[i] == 0) {
-//				numZeros++;
-//			}
-//		}
-//		return true;
-//	}
+	private boolean prune() {
+		double gradient = calculateValueGradient();
+		if (gradient >= 0) {
+			return false;
+		} else {
+			return true;
+		}
+	}
 
 	@Override
 	public ArrayList<Node> expand() {
