@@ -8,7 +8,15 @@ public class LevenshteinDistance {
 	private int n;
 	private int m;
 
+	/**
+	 * Calculates the Levenshtein Distance using a Greedy Algorithm
+	 * 
+	 * @param str1 the first string for the distance
+	 * @param str2 the second string for the distance
+	 */
 	public LevenshteinDistance(String str1, String str2) {
+		// Assign the longest string to str1 and the shortest one t str2, just to make
+		// the problem easier
 		if (str1.length() > str2.length()) {
 			this.str1 = str1.toCharArray();
 			this.str2 = str2.toCharArray();
@@ -27,6 +35,11 @@ public class LevenshteinDistance {
 		}
 	}
 
+	/**
+	 * Calculates the Levenshtein Distance and returns it as an int
+	 * 
+	 * @return int the Levenshtein Distance between str1 and str2
+	 */
 	public int calculate() {
 
 		for (int i = 1; i <= n; i++) {
@@ -39,8 +52,8 @@ public class LevenshteinDistance {
 					min = Math.min(min, secondMin);
 					matrix[i][j] = 1 + min;
 				}
-			}
-		}
+			} // for (j)
+		} // for (i)
 		return matrix[n][m];
 	}
 
@@ -63,6 +76,9 @@ public class LevenshteinDistance {
 		return solution;
 	}
 
+	/**
+	 * Shows the solution for the Levenshtein Distance
+	 */
 	public void show() {
 		System.out.println();
 		for (int i = 0; i < n + 1; i++) {

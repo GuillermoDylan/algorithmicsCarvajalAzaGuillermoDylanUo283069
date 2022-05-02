@@ -153,7 +153,7 @@ public class ImageAverager {
 			}
 			this.half1_img = calculateImage(1, sol);
 			this.half2_img = calculateImage(2, sol);
-			if(zncc() > max_zncc) {
+			if (zncc() > max_zncc) {
 				max_zncc = zncc();
 				bestSol = sol.clone();
 			}
@@ -177,56 +177,80 @@ public class ImageAverager {
 		this.avg_img = new Image(this.width, this.height);
 		this.sol = new int[sol.length];
 		this.bestSol = new int[bestSol.length];
-		
+
 		backtrackingWithUnbalancing(0, max_unbalancing, 0, 0, 0);
 		storeBestSolution();
 		System.out.println("Best solution: ");
 		printSol(bestSol);
 	}
 
+	/**
+	 * Applies backtacking with balancing to the dataset of images in order to get
+	 * the best one
+	 * 
+	 * @param level           the level on which the "node" is
+	 * @param max_unbalancing the maximum unbalancing allowed
+	 * @param set1            the number of images on the 1st set
+	 * @param set2            the number of images on the 2nd set
+	 * @param set0            the number of images on the 0 set (not used, not
+	 *                        really usefull)
+	 */
 	private void backtrackingWithUnbalancing(int level, int max_unbalancing, int set1, int set2, int set0) {
-		if (level == dataset.length) {
+		if (level == dataset.length) { // if it is a solution
 			// Solution found
-			this.half1_img = calculateImage(1, sol);
-			this.half2_img = calculateImage(2, sol);
-			if (zncc() > max_zncc) {
-				max_zncc = zncc();
-				bestSol = sol.clone();
+			this.half1_img = calculateImage(1, sol); // calculate half 1
+			this.half2_img = calculateImage(2, sol); // calculate half 2
+			if (zncc() > max_zncc) { // calculate if zncc is the best one yet
+				max_zncc = zncc(); // update max_zncc
+				bestSol = sol.clone(); // clone solution
 			}
 		} else {
 
 			if (set1 - set2 <= max_unbalancing) { // Pruning
-				sol[level] = 1;
+				sol[level] = 1; // add to level 1
 				counter++;
 				set1++;
 				backtrackingWithUnbalancing(level + 1, max_unbalancing, set1, set2, set0);
-				set1--;
-				
-				sol[level] = 2;
+				set1--; // undo changes
+
+				sol[level] = 2; // add to level 2
 				set2++;
 				counter++;
 				backtrackingWithUnbalancing(level + 1, max_unbalancing, set1, set2, set0);
-				set2--;
-				
-				sol[level] = 0;
+				set2--; // undo change
+
+				sol[level] = 0; // add to level 0
 				counter++;
 				set0++;
 				backtrackingWithUnbalancing(level + 1, max_unbalancing, set1, set2, set0);
-				set0--;
+				set0--; // undo change
 			}
 		}
 	}
 
+	/**
+	 * Calculates the Image given the value to check (1 or 2) and the solution array
+	 * 
+	 * @param i     can be 1, 2 or 0 (0 is not useful), and it calculates the
+	 *              respective half
+	 * @param array the solution array
+	 * @return Image the half calculated
+	 */
 	private Image calculateImage(int i, int array[]) {
 		Image half = new Image(this.width, this.height);
 		for (int j = 0; j < sol.length; j++) {
-			if(array[j] == i) {
+			if (array[j] == i) {
 				half.addSignal(dataset[j]);
 			}
 		}
 		return half;
 	}
 
+	/**
+	 * Prints the solution given the solution
+	 * 
+	 * @param x the solution array
+	 */
 	private void printSol(int[] x) {
 		for (int i = 0; i < x.length; i++) {
 			if (i != x.length - 1)
@@ -255,34 +279,43 @@ public class ImageAverager {
 		counter = totalCounter;
 	}
 
+	/**
+	 * Applies backtracking to get the best image on the dataset of Images
+	 * 
+	 * @param level the level at which the backtracking "node" is at
+	 */
 	private void backtracking(int level) {
-		if (level == dataset.length) {
+		if (level == dataset.length) { // if it is a solution
 			// Solution found
-			this.half1_img = calculateImage(1, sol);
-			this.half2_img = calculateImage(2, sol);
+			this.half1_img = calculateImage(1, sol); // calculate half 1
+			this.half2_img = calculateImage(2, sol);// calculate half 2
 			if (zncc() > max_zncc) {
-				this.max_zncc = zncc();
-				this.bestSol = sol.clone();
+				this.max_zncc = zncc(); // update zncc
+				this.bestSol = sol.clone(); // update solution
 			}
 		} else {
 
-			sol[level] = 1;
+			sol[level] = 1; // add to level 1
 			counter++;
 			totalCounter++;
 			backtracking(level + 1);
 
-			sol[level] = 2;
+			sol[level] = 2; // add to level 2
 			counter++;
 			totalCounter++;
 			backtracking(level + 1);
 
-			sol[level] = 0;
+			sol[level] = 0; // add to level 3
 			counter++;
 			totalCounter++;
 			backtracking(level + 1);
 		}
 	}
-	
+
+	/**
+	 * Stores the best solution calculating the halfs and the avg image based on the
+	 * bestSol array
+	 */
 	private void storeBestSolution() {
 		Image baseImageHalf1 = calculateImage(1, bestSol);
 		Image baseImageHalf2 = calculateImage(2, bestSol);
